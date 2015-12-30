@@ -16,7 +16,7 @@ class BB8(btle.DefaultDelegate):
         # address type must be "random" or it won't connect.
         self.peripheral = btle.Peripheral(
             device_address, btle.ADDR_TYPE_RANDOM)
-        self.peripheral.set_delegate(self)
+        self.peripheral.setDelegate(self)
 
         self.seq = 0
 
@@ -30,18 +30,18 @@ class BB8(btle.DefaultDelegate):
         # this startup sequence is also identical to the one for ollie.
         # it even uses the same unlock code.
         print('sending antidos')
-        self.antidos.write('011i3', with_response=True)
+        self.antidos.write('011i3', withResponse=True)
         print('sending txpower')
-        self.txpower.write('\x0007', with_response=True)
+        self.txpower.write('\x0007', withResponse=True)
         print('sending wakecpu')
-        self.wakecpu.write('\x01', with_response=True)
+        self.wakecpu.write('\x01', withResponse=True)
 
     def get_sphero_characteristic(self, fragment):
-        return self.peripheral.get_characteristics(
+        return self.peripheral.getCharacteristics(
             uuid='22bb746f' + fragment + '75542d6f726568705327')[0]
 
     def dump_characteristics(self):
-        for s in self.peripheral.get_services():
+        for s in self.peripheral.getServices():
             print(s)
             for c in s.get_characteristics():
                 print(c, hex(c.handle))
@@ -60,15 +60,15 @@ class BB8(btle.DefaultDelegate):
 
         msg = [0xff, sop2, did, cid, seq, dlen] + data + [chk]
         print('cmd:', ' '.join([chr(c).encode('hex') for c in msg]))
-        # note: with_response is very important. most commands won't work
+        # note: withResponse is very important. most commands won't work
         # without it.
-        self.roll.write(''.join([chr(c) for c in msg]), with_response=True)
+        self.roll.write(''.join([chr(c) for c in msg]), withResponse=True)
 
     def handle_notification(self, c_handle, data):
         print('notification:', c_handle, data.encode('hex'))
 
     def wait_for_notifications(self, time):
-        self.peripheral.wait_for_notifications(time)
+        self.peripheral.waitForNotifications(time)
 
     def disconnect(self):
         self.peripheral.disconnect()
