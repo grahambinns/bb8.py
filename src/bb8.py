@@ -3,16 +3,18 @@
 Based on the BB8 driver by alistair buxton <a.j.buxton@gmail.com>.
 """
 
+from __future__ import print_function
+
 from bluepy import btle
 
 
-class BB8(btle.default_delegate):
+class BB8(btle.DefaultDelegate):
 
     def __init__(self, device_address):
-        btle.default_delegate.__init__(self)
+        super(BB8, self).__init__()
 
         # address type must be "random" or it won't connect.
-        self.peripheral = btle.peripheral(
+        self.peripheral = btle.Peripheral(
             device_address, btle.ADDR_TYPE_RANDOM)
         self.peripheral.set_delegate(self)
 
@@ -27,11 +29,11 @@ class BB8(btle.default_delegate):
 
         # this startup sequence is also identical to the one for ollie.
         # it even uses the same unlock code.
-        print 'sending antidos'
+        print('sending antidos')
         self.antidos.write('011i3', with_response=True)
-        print 'sending txpower'
+        print('sending txpower')
         self.txpower.write('\x0007', with_response=True)
-        print 'sending wakecpu'
+        print('sending wakecpu')
         self.wakecpu.write('\x01', with_response=True)
 
     def get_sphero_characteristic(self, fragment):
@@ -40,9 +42,9 @@ class BB8(btle.default_delegate):
 
     def dump_characteristics(self):
         for s in self.peripheral.get_services():
-            print s
+            print(s)
             for c in s.get_characteristics():
-                print c, hex(c.handle)
+                print(c, hex(c.handle))
 
     def cmd(self, did, cid, data=[], answer=True, reset_timeout=True):
         # commands are as specified in sphero aPI 1.50 pDF.
@@ -57,13 +59,13 @@ class BB8(btle.default_delegate):
         chk ^= 255
 
         msg = [0xff, sop2, did, cid, seq, dlen] + data + [chk]
-        print 'cmd:', ' '.join([chr(c).encode('hex') for c in msg])
+        print('cmd:', ' '.join([chr(c).encode('hex') for c in msg]))
         # note: with_response is very important. most commands won't work
         # without it.
         self.roll.write(''.join([chr(c) for c in msg]), with_response=True)
 
     def handle_notification(self, c_handle, data):
-        print 'notification:', c_handle, data.encode('hex')
+        print('notification:', c_handle, data.encode('hex'))
 
     def wait_for_notifications(self, time):
         self.peripheral.wait_for_notifications(time)
