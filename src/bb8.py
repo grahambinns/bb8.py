@@ -1,9 +1,12 @@
-""" driver by alistair buxton <a.j.buxton@gmail.com>"""
+"""BB8 driver module.
 
-import btle
+Based on the BB8 driver by alistair buxton <a.j.buxton@gmail.com>.
+"""
+
+from bluepy import btle
 
 
-class bB8(btle.default_delegate):
+class BB8(btle.default_delegate):
 
     def __init__(self, device_address):
         btle.default_delegate.__init__(self)
@@ -72,7 +75,7 @@ class bB8(btle.default_delegate):
 if __name__ == '__main__':
 
     # connect by address. use "sudo hcitool lescan" to find address.
-    bb = bB8('cd:9b:6c:96:6b:10')
+    bb = BB8('cd:9b:6c:96:6b:10')
 
     # dump all gATT stuff.
     # bb.dump_characteristics()
